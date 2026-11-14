@@ -1,23 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from '@tanstack/react-router';
+import { Deck } from '@/components/presentation/Deck';
+import { boundSlide } from '@/data/slides';
 
-// The home route ships no og:image, so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute('/')({
+  validateSearch: (search: Record<string, unknown>) => ({slide: boundSlide((Number(search['slide']) || 1)-1)+1}),
+  head: () => ({meta: [
+    {title:'La TEP — De la désintégration radioactive à l’image'},
+    {name:'description',content:'Présentation interactive en français : principes physiques, radiotraceurs et appareil de tomographie par émission de positons.'},
+    {property:'og:title',content:'La TEP — L’invisible révélé'},
+    {property:'og:description',content:'Un parcours scientifique animé, de la désintégration radioactive à l’image médicale.'},
+    {property:'og:type',content:'website'},
+    {name:'twitter:card',content:'summary_large_image'},
+  ]}),
   component: Index,
 });
-
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
+function Index() {const {slide}=Route.useSearch();return <Deck index={slide-1}/>;}
