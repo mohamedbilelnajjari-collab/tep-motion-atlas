@@ -3,7 +3,7 @@ import { Deck } from '@/components/presentation/Deck';
 import { boundSlide } from '@/data/slides';
 
 export const Route = createFileRoute('/')({
-  validateSearch: (search: Record<string, unknown>) => ({slide: boundSlide((Number(search.slide) || 1)-1)+1}),
+  validateSearch: (search: Record<string, unknown>) => ({slide: boundSlide((Number(search['slide']) || 1)-1)+1}),
   head: () => ({meta: [
     {title:'La TEP — De la désintégration radioactive à l’image'},
     {name:'description',content:'Présentation interactive en français : principes physiques, radiotraceurs et appareil de tomographie par émission de positons.'},

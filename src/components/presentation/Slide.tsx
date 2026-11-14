@@ -7,12 +7,12 @@ import { Cyclotron, DetectorRing, ImageGrid, ParticleDiagram, Scanner, SignalDia
 
 export function ScaledSlide({children}:{children:React.ReactNode}) {
   const parent=useRef<HTMLDivElement>(null);const [scale,setScale]=useState(0);
-  useEffect(()=>{const el=parent.current;if(!el)return;const observer=new ResizeObserver(([entry])=>{if(entry)setScale(Math.min(entry.contentRect.width/1920,entry.contentRect.height/1080));});observer.observe(el);return()=>observer.disconnect();},[]);
+  useEffect(()=>{const el=parent.current;if(!el)return;const observer=new ResizeObserver(([entry])=>{if(entry){const portrait=window.matchMedia('(max-width: 600px)').matches;setScale(Math.min(entry.contentRect.width/(portrait?1080:1920),entry.contentRect.height/(portrait?1920:1080)));}});observer.observe(el);return()=>observer.disconnect();},[]);
   return <div ref={parent} className="slide-viewport"><div className="slide-wrapper" style={{transform:`scale(${scale})`}}>{children}</div></div>;
 }
 function Count({value,suffix}:{value:number;suffix:string}) {const [n,setN]=useState(0);const reduced=useReducedMotion();useEffect(()=>{if(reduced){setN(value);return;}let frame=0;const start=performance.now();const step=(time:number)=>{const p=Math.min((time-start)/1100,1);setN(Math.round(value*(1-Math.pow(1-p,3))));if(p<1)frame=requestAnimationFrame(step);};frame=requestAnimationFrame(step);return()=>cancelAnimationFrame(frame);},[value,reduced]);return <span>{n}<small>{suffix}</small></span>;}
 const reveal={hidden:{opacity:0,y:20},show:{opacity:1,y:0}};
-function Points({points}:{points?:string[]}) {return <div className="slide-points">{points?.map(p=><motion.div variants={reveal} className="slide-point" key={p}><span className="point-dot"/>{p}</motion.div>)}</div>;}
+function Points({points}:{points:string[]|undefined}) {return <div className="slide-points">{points?.map(p=><motion.div variants={reveal} className="slide-point" key={p}><span className="point-dot"/>{p}</motion.div>)}</div>;}
 function Tile({icon:Icon,title,children}:{icon:typeof Atom;title:string;children:React.ReactNode}) {return <motion.article variants={reveal} className="science-card"><Icon className="science-icon"/><h3>{title}</h3><div>{children}</div></motion.article>;}
 export function Slide({slide,onGo}:{slide:SlideData;onGo:(n:number)=>void}) {
  const reduced=useReducedMotion();
