@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Presentation architecture
+- Keep editable slide content in a separate browser-safe data registry; reusable Deck, Slide, Progress and SVG diagrams render it without server dependencies.
+- Render slides at 1920×1080 through one centered ScaledSlide component; update the shared design tokens rather than creating a second scaling system.
+- Use the one-based `slide` search parameter as navigation state with replace navigation, so refresh and shared links preserve the current slide.
