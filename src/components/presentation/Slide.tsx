@@ -1,41 +1,615 @@
-import { useEffect, useRef, useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Activity, ArrowRight, Atom, Brain, Check, CircleDot, Clock3, Heart, Layers, Radiation, ScanLine, ShieldCheck, Sparkles, X, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { crystalRows, isotopeRows, sections, type SlideData } from '@/data/slides';
-import { Cyclotron, DetectorRing, ImageGrid, ParticleDiagram, Scanner, SignalDiagram } from './Diagrams';
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import {
+  Activity,
+  ArrowRight,
+  Atom,
+  Brain,
+  Check,
+  CircleDot,
+  Clock3,
+  Heart,
+  Layers,
+  Radiation,
+  ScanLine,
+  ShieldCheck,
+  Sparkles,
+  X,
+  Zap,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { crystalRows, isotopeRows, sections, type SlideData } from "@/data/slides";
+import {
+  Cyclotron,
+  DetectorRing,
+  ImageGrid,
+  ParticleDiagram,
+  Scanner,
+  SignalDiagram,
+} from "./Diagrams";
 
-export function ScaledSlide({children}:{children:React.ReactNode}) {
-  const parent=useRef<HTMLDivElement>(null);const [scale,setScale]=useState(0);
-  useEffect(()=>{const el=parent.current;if(!el)return;const observer=new ResizeObserver(([entry])=>{if(entry){const portrait=window.matchMedia('(max-width: 600px)').matches;setScale(Math.min(entry.contentRect.width/(portrait?1080:1920),entry.contentRect.height/(portrait?1920:1080)));}});observer.observe(el);return()=>observer.disconnect();},[]);
-  return <div ref={parent} className="slide-viewport"><div className="slide-wrapper" style={{transform:`scale(${scale})`}}>{children}</div></div>;
+export function ScaledSlide({ children }: { children: React.ReactNode }) {
+  const parent = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(0);
+  useEffect(() => {
+    const el = parent.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry) {
+        const portrait = window.matchMedia("(max-width: 600px)").matches;
+        setScale(
+          Math.min(
+            entry.contentRect.width / (portrait ? 1080 : 1920),
+            entry.contentRect.height / (portrait ? 1920 : 1080),
+          ),
+        );
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <div ref={parent} className="slide-viewport">
+      <div className="slide-wrapper" style={{ transform: `scale(${scale})` }}>
+        {children}
+      </div>
+    </div>
+  );
 }
-function Count({value,suffix}:{value:number;suffix:string}) {const [n,setN]=useState(0);const reduced=useReducedMotion();useEffect(()=>{if(reduced){setN(value);return;}let frame=0;const start=performance.now();const step=(time:number)=>{const p=Math.min((time-start)/1100,1);setN(Math.round(value*(1-Math.pow(1-p,3))));if(p<1)frame=requestAnimationFrame(step);};frame=requestAnimationFrame(step);return()=>cancelAnimationFrame(frame);},[value,reduced]);return <span>{n}<small>{suffix}</small></span>;}
-const reveal={hidden:{opacity:0,y:20},show:{opacity:1,y:0}};
-function Points({points}:{points:string[]|undefined}) {return <div className="slide-points">{points?.map(p=><motion.div variants={reveal} className="slide-point" key={p}><span className="point-dot"/>{p}</motion.div>)}</div>;}
-function Tile({icon:Icon,title,children}:{icon:typeof Atom;title:string;children:React.ReactNode}) {return <motion.article variants={reveal} className="science-card"><Icon className="science-icon"/><h3>{title}</h3><div>{children}</div></motion.article>;}
-export function Slide({slide,onGo}:{slide:SlideData;onGo:(n:number)=>void}) {
- const reduced=useReducedMotion();
- const content=()=>{switch(slide.kind){
- case 'cover':return <div className="cover-layout"><div className="cover-copy"><motion.div variants={reveal} className="subject-badge"><span/>IMAGERIE FONCTIONNELLE</motion.div><motion.h1 variants={reveal}>La <span>TEP</span><i>.</i></motion.h1><motion.h2 variants={reveal}>De la désintégration<br/>radioactive à l’image</motion.h2><motion.p variants={reveal} className="cover-summary">Explorer l’invisible.<br/>Comprendre la physique de l’imagerie médicale.</motion.p><motion.div variants={reveal} className="cover-rule"/><motion.div variants={reveal} className="cover-topics"><span><Atom/>Physique</span><span><Radiation/>Radiotraceur</span><span><ScanLine/>Technologie</span></motion.div></div><motion.div variants={reveal} className="cover-visual"><DetectorRing/><span className="visual-caption">DEUX PHOTONS. UNE IMAGE.</span></motion.div></div>;
- case 'section':return <div className="section-layout"><motion.span variants={reveal} className="section-number">0{slide.section}</motion.span><div><motion.p variants={reveal} className="section-eyebrow">UNE ÉTAPE VERS L’IMAGE</motion.p><motion.h1 variants={reveal}>{slide.title}</motion.h1><motion.p variants={reveal} className="slide-subtitle">{slide.subtitle}</motion.p><motion.div variants={reveal} className="section-line"/></div><Atom className="section-atom"/></div>;
- case 'question':return <div className="question-layout"><motion.h1 variants={reveal}>Comment l’appareil<br/>transforme-t-il une<br/><span>désintégration radioactive</span><br/>en image ?</motion.h1><motion.div variants={reveal} className="question-flow"><div className="question-particle"><Atom/></div><div className="flow-connector"/><ImageGrid/></motion.div></div>;
- case 'agenda':return <div className="three-columns agenda-columns">{sections.map((s,i)=><motion.div variants={reveal} key={s.number}><Button variant="outline" className="agenda-card" onClick={()=>onGo(s.index)}><span className="agenda-number">{s.number}</span>{i===0?<Atom/>:i===1?<Radiation/>:<ScanLine/>}<h3>{s.title}</h3><p>{s.subtitle}</p><span className="agenda-bottom">EXPLORER LA PARTIE <ArrowRight/></span></Button></motion.div>)}</div>;
- case 'intro':return <><div className="comparison-row"><Tile icon={Activity} title="Imagerie fonctionnelle"><p>TEP</p><span>Métabolisme · activité des tissus</span><div className="mini-pixels"><ImageGrid/></div></Tile><Tile icon={Layers} title="Imagerie anatomique"><p>Scanner / IRM</p><span>Structure · forme des organes</span><svg viewBox="0 0 240 150" className="anatomy-shape"><ellipse cx="120" cy="75" rx="65" ry="60"/><ellipse cx="120" cy="75" rx="45" ry="43"/><path d="M120 15v120M55 75h130"/></svg></Tile></div><div className="domain-row">{[ [Radiation,'Oncologie'],[Heart,'Cardiologie'],[Brain,'Neurologie'] ].map(([Icon,label])=>{const I=Icon as typeof Atom;return <div key={String(label)}><I/>{String(label)}</div>;})}</div></>;
- case 'beta':case 'annihilation':return <div className="diagram-content"><ParticleDiagram kind={slide.kind}/><Points points={slide.points}/></div>;
- case 'gamma':return <><ParticleDiagram kind="gamma"/><div className="stats-row"><div><Count value={511} suffix="keV"/><p>ÉNERGIE DE CHAQUE PHOTON</p></div><div><Count value={180} suffix="°"/><p>DIRECTIONS QUASI OPPOSÉES</p></div></div></>;
- case 'interactions':return <div className="three-columns"><Tile icon={Zap} title="Effet photoélectrique"><div className="interaction-symbol">γ <ArrowRight/> <CircleDot/></div><p>Absorption totale du photon.</p><span>Dans le cristal : une détection utile.</span></Tile><Tile icon={Sparkles} title="Diffusion Compton"><svg viewBox="0 0 220 100" className="mini-diagram"><path d="M10 60h90l90-45M100 60l80 35"/><circle cx="100" cy="60" r="9"/></svg><p>Déviation et perte d’énergie.</p><span>Des lignes mal localisées, du contraste en moins.</span></Tile><Tile icon={ShieldCheck} title="Atténuation"><div className="interaction-symbol">γ <Layers/> <span className="faded">γ</span></div><p>Moins de photons transmis.</p><span>Une correction nécessaire pour quantifier l’activité.</span></Tile></div>;
- case 'isotopes':return <><div className="isotope-table"><div className="table-heading"><span>ISOTOPE</span><span>DEMI-VIE PHYSIQUE</span><span>TEMPS RELATIF</span></div>{isotopeRows.map((r,i)=><motion.div variants={reveal} className={`isotope-row ${i===0?'featured':''}`} key={r.name}><strong>{r.name}</strong><span>{r.label}</span><div className="half-life-track"><motion.div initial={{width:0}} animate={{width:`${r.minutes/110*100}%`}} transition={{duration:reduced?0:1,delay:i*.15}}/></div></motion.div>)}</div><div className="callout"><Clock3/><div><strong>¹⁸F : le compromis pratique</strong><p>Assez de temps pour synthétiser, transporter et réaliser l’examen. Le ¹⁸F-FDG est le traceur de référence.</p></div></div></>;
- case 'cyclotron':return <div className="diagram-content"><Cyclotron/><Points points={slide.points}/></div>;
- case 'fdg':return <><div className="timeline">{['Production','Synthèse','Contrôle qualité','Injection','Fixation'].map((t,i)=><motion.div variants={reveal} key={t}><span>{i===2?<ShieldCheck/>:i===3?<Activity/>:i===4?<Clock3/>:i===0?<Atom/>:<Radiation/>}</span><p>{t}</p><small>0{i+1}</small></motion.div>)}</div><div className="fdg-bottom"><svg viewBox="0 0 500 270" className="cell-diagram" role="img" aria-label="Le FDG entre dans une cellule et y est phosphorylé"><ellipse cx="320" cy="135" rx="150" ry="110"/><path d="M50 135h200"/><motion.g animate={{x:[0,200]}} transition={{duration:4,repeat:Infinity}}><path d="M55 110l25-15 25 15v30l-25 15-25-15Z"/><text x="55" y="185">FDG</text></motion.g><text x="310" y="145">FDG-6-P</text></svg><Points points={slide.points}/></div></>;
- case 'scanner':return <Scanner/>;
- case 'crystals':return <><SignalDiagram mode="crystal"/><table className="science-table"><thead><tr>{['CRISTAL','DENSITÉ (g/cm³)','LUMIÈRE (ph/MeV)','DÉCROISSANCE (ns)','USAGE'].map(t=><th key={t}>{t}</th>)}</tr></thead><tbody>{crystalRows.map(r=><tr key={r[0]}>{r.map((c,i)=><td key={i}>{c}</td>)}</tr>)}</tbody></table><p className="source-note">Ordres de grandeur, variables selon la composition. Source : <a href="https://www.berkeleynucleonics.com/books/scintillators/html/03-materials.html" target="_blank" rel="noreferrer">Berkeley Nucleonics · propriétés des scintillateurs</a>.</p></>;
- case 'sensors':return <><SignalDiagram/><div className="three-columns sensor-columns"><Tile icon={Zap} title="PMT"><p>Tube photomultiplicateur</p><span>Gain élevé · volumineux<br/>Sensible au champ magnétique</span></Tile><Tile icon={Activity} title="APD"><p>Photodiode à avalanche</p><span>Compacte · gain modéré<br/>Compatible avec l’IRM</span></Tile><Tile icon={Sparkles} title="SiPM"><p>Photomultiplicateur silicium</p><span>Compact · gain élevé<br/>TOF & TEP numérique</span></Tile></div></>;
- case 'ring':return <div className="diagram-content"><DetectorRing compact/><Points points={slide.points}/></div>;
- case 'electronics':return <><div className="process-chain">{['Amplification','Discrimination en énergie','Horloge de coïncidence'].map((t,i)=><div key={t}><span>0{i+1}</span><h3>{t}</h3>{i<2&&<ArrowRight/>}</div>)}</div><div className="coincidence"><div className="coincidence-label"><Clock3/><span>FENÊTRE DE COÏNCIDENCE · QUELQUES ns</span></div><svg viewBox="0 0 1200 180" role="img" aria-label="Deux événements dans la fenêtre sont validés, un événement hors fenêtre est rejeté"><rect x="330" y="15" width="340" height="135" className="time-window"/><path d="M50 120h1100" className="dashed-path"/><path d="M180 120h200l12-65 12 65h125l12-55 12 55h320l12-70 12 70h220" className="signal-wave"/><text x="380" y="40" className="label-small">A</text><text x="530" y="40" className="label-small">B</text><text x="875" y="40" className="label-small">C</text></svg><div className="coincidence-results"><span><Check/> A + B : paire validée</span><span><X/> C : hors fenêtre</span></div></div></>;
- case 'reconstruction':return <><div className="reconstruction-flow"><div><DetectorRing compact/><p>Acquisition</p></div><ArrowRight/><div><svg viewBox="0 0 240 240" className="lor-image">{[20,50,80,110,140,170].map((n,i)=><path key={n} d={`M${n} 15L${240-n} 225M15 ${n}L225 ${240-n}`} className={i%2?'gamma-trail':'gamma-beam'}/>)}</svg><p>Lignes de réponse</p></div><ArrowRight/><div><ImageGrid/><p>Reconstruction</p></div></div><Points points={slide.points}/></>;
- case 'end':return <div className="end-layout"><div className="end-orbit"><DetectorRing compact/></div><motion.h1 variants={reveal}>Merci<span>.</span></motion.h1><motion.p variants={reveal}>Questions ?</motion.p><div className="end-bottom"><span>PHYSIQUE</span><ArrowRight/><span>DÉTECTION</span><ArrowRight/><span>IMAGE</span></div></div>;
- }};
- const special=['cover','section','question','end'].includes(slide.kind);
- return <motion.section className={`slide-content slide-${slide.kind}`} initial="hidden" animate="show" transition={{staggerChildren:reduced?0:.1}}><div className="slide-kicker"><span className="kicker-line"/>{slide.kicker}</div>{!special&&<header className="slide-heading"><motion.h1 variants={reveal}>{slide.title}</motion.h1><motion.p variants={reveal}>{slide.subtitle}</motion.p></header>}<div className={special?'slide-main special-main':'slide-main'}>{content()}</div><div className="slide-footer"><span>TEP <span className="footer-separator">/</span> IMAGERIE FONCTIONNELLE</span><span>{slide.section?`PARTIE 0${slide.section}`:'DE LA DÉSINTÉGRATION À L’IMAGE'}</span></div></motion.section>;
+function Count({ value, suffix }: { value: number; suffix: string }) {
+  const [n, setN] = useState(0);
+  const reduced = useReducedMotion();
+  useEffect(() => {
+    if (reduced) {
+      setN(value);
+      return;
+    }
+    let frame = 0;
+    const start = performance.now();
+    const step = (time: number) => {
+      const p = Math.min((time - start) / 1100, 1);
+      setN(Math.round(value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [value, reduced]);
+  return (
+    <span>
+      {n}
+      <small>{suffix}</small>
+    </span>
+  );
+}
+const reveal = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
+function Points({ points }: { points: string[] | undefined }) {
+  return (
+    <div className="slide-points">
+      {points?.map((p) => (
+        <motion.div variants={reveal} className="slide-point" key={p}>
+          <span className="point-dot" />
+          {p}
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+function Tile({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: typeof Atom;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <motion.article variants={reveal} className="science-card">
+      <Icon className="science-icon" />
+      <h3>{title}</h3>
+      <div>{children}</div>
+    </motion.article>
+  );
+}
+export function Slide({ slide, onGo }: { slide: SlideData; onGo: (n: number) => void }) {
+  const reduced = useReducedMotion();
+  const content = () => {
+    switch (slide.kind) {
+      case "cover":
+        return (
+          <div className="cover-layout">
+            <div className="cover-copy">
+              <motion.div variants={reveal} className="subject-badge">
+                <span />
+                IMAGERIE FONCTIONNELLE
+              </motion.div>
+              <motion.h1 variants={reveal}>
+                La <span>TEP</span>
+                <i>.</i>
+              </motion.h1>
+              <motion.h2 variants={reveal}>
+                De la désintégration
+                <br />
+                radioactive à l’image
+              </motion.h2>
+              <motion.p variants={reveal} className="cover-summary">
+                Explorer l’invisible.
+                <br />
+                Comprendre la physique de l’imagerie médicale.
+              </motion.p>
+              <motion.div variants={reveal} className="cover-rule" />
+              <motion.div variants={reveal} className="cover-topics">
+                <span>
+                  <Atom />
+                  Physique
+                </span>
+                <span>
+                  <Radiation />
+                  Radiotraceur
+                </span>
+                <span>
+                  <ScanLine />
+                  Technologie
+                </span>
+              </motion.div>
+            </div>
+            <motion.div variants={reveal} className="cover-visual">
+              <DetectorRing />
+              <span className="visual-caption">DEUX PHOTONS. UNE IMAGE.</span>
+            </motion.div>
+          </div>
+        );
+      case "section":
+        return (
+          <div className="section-layout">
+            <motion.span variants={reveal} className="section-number">
+              0{slide.section}
+            </motion.span>
+            <div>
+              <motion.p variants={reveal} className="section-eyebrow">
+                UNE ÉTAPE VERS L’IMAGE
+              </motion.p>
+              <motion.h1 variants={reveal}>{slide.title}</motion.h1>
+              <motion.p variants={reveal} className="slide-subtitle">
+                {slide.subtitle}
+              </motion.p>
+              <motion.div variants={reveal} className="section-line" />
+            </div>
+            <Atom className="section-atom" />
+          </div>
+        );
+      case "question":
+        return (
+          <div className="question-layout">
+            <motion.h1 variants={reveal}>
+              Comment l’appareil
+              <br />
+              transforme-t-il une
+              <br />
+              <span>désintégration radioactive</span>
+              <br />
+              en image ?
+            </motion.h1>
+            <motion.div variants={reveal} className="question-flow">
+              <div className="question-particle">
+                <Atom />
+              </div>
+              <div className="flow-connector" />
+              <ImageGrid />
+            </motion.div>
+          </div>
+        );
+      case "agenda":
+        return (
+          <div className="three-columns agenda-columns">
+            {sections.map((s, i) => (
+              <motion.div variants={reveal} key={s.number}>
+                <Button variant="outline" className="agenda-card" onClick={() => onGo(s.index)}>
+                  <span className="agenda-number">{s.number}</span>
+                  {i === 0 ? <Atom /> : i === 1 ? <Radiation /> : <ScanLine />}
+                  <h3>{s.title}</h3>
+                  <p>{s.subtitle}</p>
+                  <span className="agenda-bottom">
+                    EXPLORER LA PARTIE <ArrowRight />
+                  </span>
+                </Button>
+              </motion.div>
+            ))}
+          </div>
+        );
+      case "intro":
+        return (
+          <>
+            <div className="comparison-row">
+              <Tile icon={Activity} title="Imagerie fonctionnelle">
+                <p>TEP</p>
+                <span>Métabolisme · activité des tissus</span>
+                <div className="mini-pixels">
+                  <ImageGrid />
+                </div>
+              </Tile>
+              <Tile icon={Layers} title="Imagerie anatomique">
+                <p>Scanner / IRM</p>
+                <span>Structure · forme des organes</span>
+                <svg viewBox="0 0 240 150" className="anatomy-shape">
+                  <ellipse cx="120" cy="75" rx="65" ry="60" />
+                  <ellipse cx="120" cy="75" rx="45" ry="43" />
+                  <path d="M120 15v120M55 75h130" />
+                </svg>
+              </Tile>
+            </div>
+            <div className="domain-row">
+              {[
+                [Radiation, "Oncologie"],
+                [Heart, "Cardiologie"],
+                [Brain, "Neurologie"],
+              ].map(([Icon, label]) => {
+                const I = Icon as typeof Atom;
+                return (
+                  <div key={String(label)}>
+                    <I />
+                    {String(label)}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        );
+      case "beta":
+      case "annihilation":
+        return (
+          <div className="diagram-content">
+            <ParticleDiagram kind={slide.kind} />
+            <Points points={slide.points} />
+          </div>
+        );
+      case "gamma":
+        return (
+          <>
+            <ParticleDiagram kind="gamma" />
+            <div className="stats-row">
+              <div>
+                <Count value={511} suffix="keV" />
+                <p>ÉNERGIE DE CHAQUE PHOTON</p>
+              </div>
+              <div>
+                <Count value={180} suffix="°" />
+                <p>DIRECTIONS QUASI OPPOSÉES</p>
+              </div>
+            </div>
+          </>
+        );
+      case "interactions":
+        return (
+          <div className="three-columns">
+            <Tile icon={Zap} title="Effet photoélectrique">
+              <div className="interaction-symbol">
+                γ <ArrowRight /> <CircleDot />
+              </div>
+              <p>Absorption totale du photon.</p>
+              <span>Dans le cristal : une détection utile.</span>
+            </Tile>
+            <Tile icon={Sparkles} title="Diffusion Compton">
+              <svg viewBox="0 0 220 100" className="mini-diagram">
+                <path d="M10 60h90l90-45M100 60l80 35" />
+                <circle cx="100" cy="60" r="9" />
+              </svg>
+              <p>Déviation et perte d’énergie.</p>
+              <span>Des lignes mal localisées, du contraste en moins.</span>
+            </Tile>
+            <Tile icon={ShieldCheck} title="Atténuation">
+              <div className="interaction-symbol">
+                γ <Layers /> <span className="faded">γ</span>
+              </div>
+              <p>Moins de photons transmis.</p>
+              <span>Une correction nécessaire pour quantifier l’activité.</span>
+            </Tile>
+          </div>
+        );
+      case "isotopes":
+        return (
+          <>
+            <div className="isotope-table">
+              <div className="table-heading">
+                <span>ISOTOPE</span>
+                <span>DEMI-VIE PHYSIQUE</span>
+                <span>TEMPS RELATIF</span>
+              </div>
+              {isotopeRows.map((r, i) => (
+                <motion.div
+                  variants={reveal}
+                  className={`isotope-row ${i === 0 ? "featured" : ""}`}
+                  key={r.name}
+                >
+                  <strong>{r.name}</strong>
+                  <span>{r.label}</span>
+                  <div className="half-life-track">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(r.minutes / 110) * 100}%` }}
+                      transition={{ duration: reduced ? 0 : 1, delay: i * 0.15 }}
+                    />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <div className="callout">
+              <Clock3 />
+              <div>
+                <strong>¹⁸F : le compromis pratique</strong>
+                <p>
+                  Assez de temps pour synthétiser, transporter et réaliser l’examen. Le ¹⁸F-FDG est
+                  le traceur de référence.
+                </p>
+              </div>
+            </div>
+          </>
+        );
+      case "cyclotron":
+        return (
+          <div className="diagram-content">
+            <Cyclotron />
+            <Points points={slide.points} />
+          </div>
+        );
+      case "fdg":
+        return (
+          <>
+            <div className="timeline">
+              {["Production", "Synthèse", "Contrôle qualité", "Injection", "Fixation"].map(
+                (t, i) => (
+                  <motion.div variants={reveal} key={t}>
+                    <span>
+                      {i === 2 ? (
+                        <ShieldCheck />
+                      ) : i === 3 ? (
+                        <Activity />
+                      ) : i === 4 ? (
+                        <Clock3 />
+                      ) : i === 0 ? (
+                        <Atom />
+                      ) : (
+                        <Radiation />
+                      )}
+                    </span>
+                    <p>{t}</p>
+                    <small>0{i + 1}</small>
+                  </motion.div>
+                ),
+              )}
+            </div>
+            <div className="fdg-bottom">
+              <svg
+                viewBox="0 0 500 270"
+                className="cell-diagram"
+                role="img"
+                aria-label="Le FDG entre dans une cellule et y est phosphorylé"
+              >
+                <ellipse cx="320" cy="135" rx="150" ry="110" />
+                <path d="M50 135h200" />
+                <motion.g animate={{ x: [0, 200] }} transition={{ duration: 4, repeat: Infinity }}>
+                  <path d="M55 110l25-15 25 15v30l-25 15-25-15Z" />
+                  <text x="55" y="185">
+                    FDG
+                  </text>
+                </motion.g>
+                <text x="310" y="145">
+                  FDG-6-P
+                </text>
+              </svg>
+              <Points points={slide.points} />
+            </div>
+          </>
+        );
+      case "scanner":
+        return <Scanner />;
+      case "crystals":
+        return (
+          <>
+            <SignalDiagram mode="crystal" />
+            <table className="science-table">
+              <thead>
+                <tr>
+                  {[
+                    "CRISTAL",
+                    "DENSITÉ (g/cm³)",
+                    "LUMIÈRE (ph/MeV)",
+                    "DÉCROISSANCE (ns)",
+                    "USAGE",
+                  ].map((t) => (
+                    <th key={t}>{t}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {crystalRows.map((r) => (
+                  <tr key={r[0]}>
+                    {r.map((c, i) => (
+                      <td key={i}>{c}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p className="source-note">
+              Ordres de grandeur, variables selon la composition. Source :{" "}
+              <a
+                href="https://www.berkeleynucleonics.com/books/scintillators/html/03-materials.html"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Berkeley Nucleonics · propriétés des scintillateurs
+              </a>
+              .
+            </p>
+          </>
+        );
+      case "sensors":
+        return (
+          <>
+            <SignalDiagram />
+            <div className="three-columns sensor-columns">
+              <Tile icon={Zap} title="PMT">
+                <p>Tube photomultiplicateur</p>
+                <span>
+                  Gain élevé · volumineux
+                  <br />
+                  Sensible au champ magnétique
+                </span>
+              </Tile>
+              <Tile icon={Activity} title="APD">
+                <p>Photodiode à avalanche</p>
+                <span>
+                  Compacte · gain modéré
+                  <br />
+                  Compatible avec l’IRM
+                </span>
+              </Tile>
+              <Tile icon={Sparkles} title="SiPM">
+                <p>Photomultiplicateur silicium</p>
+                <span>
+                  Compact · gain élevé
+                  <br />
+                  TOF & TEP numérique
+                </span>
+              </Tile>
+            </div>
+          </>
+        );
+      case "ring":
+        return (
+          <div className="diagram-content">
+            <DetectorRing compact />
+            <Points points={slide.points} />
+          </div>
+        );
+      case "electronics":
+        return (
+          <>
+            <div className="process-chain">
+              {["Amplification", "Discrimination en énergie", "Horloge de coïncidence"].map(
+                (t, i) => (
+                  <div key={t}>
+                    <span>0{i + 1}</span>
+                    <h3>{t}</h3>
+                    {i < 2 && <ArrowRight />}
+                  </div>
+                ),
+              )}
+            </div>
+            <div className="coincidence">
+              <div className="coincidence-label">
+                <Clock3 />
+                <span>FENÊTRE DE COÏNCIDENCE · QUELQUES ns</span>
+              </div>
+              <svg
+                viewBox="0 0 1200 180"
+                role="img"
+                aria-label="Deux événements dans la fenêtre sont validés, un événement hors fenêtre est rejeté"
+              >
+                <rect x="330" y="15" width="340" height="135" className="time-window" />
+                <path d="M50 120h1100" className="dashed-path" />
+                <path
+                  d="M180 120h200l12-65 12 65h125l12-55 12 55h320l12-70 12 70h220"
+                  className="signal-wave"
+                />
+                <text x="380" y="40" className="label-small">
+                  A
+                </text>
+                <text x="530" y="40" className="label-small">
+                  B
+                </text>
+                <text x="875" y="40" className="label-small">
+                  C
+                </text>
+              </svg>
+              <div className="coincidence-results">
+                <span>
+                  <Check /> A + B : paire validée
+                </span>
+                <span>
+                  <X /> C : hors fenêtre
+                </span>
+              </div>
+            </div>
+          </>
+        );
+      case "reconstruction":
+        return (
+          <>
+            <div className="reconstruction-flow">
+              <div>
+                <DetectorRing compact />
+                <p>Acquisition</p>
+              </div>
+              <ArrowRight />
+              <div>
+                <svg viewBox="0 0 240 240" className="lor-image">
+                  {[20, 50, 80, 110, 140, 170].map((n, i) => (
+                    <path
+                      key={n}
+                      d={`M${n} 15L${240 - n} 225M15 ${n}L225 ${240 - n}`}
+                      className={i % 2 ? "gamma-trail" : "gamma-beam"}
+                    />
+                  ))}
+                </svg>
+                <p>Lignes de réponse</p>
+              </div>
+              <ArrowRight />
+              <div>
+                <ImageGrid />
+                <p>Reconstruction</p>
+              </div>
+            </div>
+            <Points points={slide.points} />
+          </>
+        );
+      case "end":
+        return (
+          <div className="end-layout">
+            <div className="end-orbit">
+              <DetectorRing compact />
+            </div>
+            <motion.h1 variants={reveal}>
+              Merci<span>.</span>
+            </motion.h1>
+            <motion.p variants={reveal}>Questions ?</motion.p>
+            <div className="end-bottom">
+              <span>PHYSIQUE</span>
+              <ArrowRight />
+              <span>DÉTECTION</span>
+              <ArrowRight />
+              <span>IMAGE</span>
+            </div>
+          </div>
+        );
+    }
+  };
+  const special = ["cover", "section", "question", "end"].includes(slide.kind);
+  return (
+    <motion.section
+      className={`slide-content slide-${slide.kind}`}
+      initial="hidden"
+      animate="show"
+      transition={{ staggerChildren: reduced ? 0 : 0.1 }}
+    >
+      <div className="slide-kicker">
+        <span className="kicker-line" />
+        {slide.kicker}
+      </div>
+      {!special && (
+        <header className="slide-heading">
+          <motion.h1 variants={reveal}>{slide.title}</motion.h1>
+          <motion.p variants={reveal}>{slide.subtitle}</motion.p>
+        </header>
+      )}
+      <div className={special ? "slide-main special-main" : "slide-main"}>{content()}</div>
+      <div className="slide-footer">
+        <span>
+          TEP <span className="footer-separator">/</span> IMAGERIE FONCTIONNELLE
+        </span>
+        <span>{slide.section ? `PARTIE 0${slide.section}` : "DE LA DÉSINTÉGRATION À L’IMAGE"}</span>
+      </div>
+    </motion.section>
+  );
 }

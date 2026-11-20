@@ -31,5 +31,5 @@ use the editor.
 
 ## Presentation architecture
 - Keep editable slide content in a separate browser-safe data registry; reusable Deck, Slide, Progress and SVG diagrams render it without server dependencies.
-- Render slides at 1920×1080 through one centered ScaledSlide component; update the shared design tokens rather than creating a second scaling system.
+- Use one centered ScaledSlide component with a 1920×1080 desktop master and a 1080×1920 portrait mobile master; shared tokens keep both layouts consistent and readable.
 - Use the one-based `slide` search parameter as navigation state with replace navigation, so refresh and shared links preserve the current slide.

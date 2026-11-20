@@ -1,29 +1,361 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
-export function DetectorRing({compact=false}:{compact?:boolean}) {
-  return <svg className={`detector-ring ${compact?'compact':''}`} viewBox="0 0 800 660" role="img" aria-label="Anneau de détecteurs et deux photons gamma opposés">
-    <defs><radialGradient id="ring-light"><stop offset="0" stopColor="var(--primary)" stopOpacity=".13"/><stop offset="1" stopColor="var(--primary)" stopOpacity="0"/></radialGradient><filter id="ring-glow"><feGaussianBlur stdDeviation="4"/></filter></defs>
-    <circle cx="400" cy="330" r="270" fill="url(#ring-light)"/>
-    <g className="orbit-lines"><ellipse cx="400" cy="330" rx="325" ry="290"/><ellipse cx="400" cy="330" rx="305" ry="270"/><circle cx="400" cy="330" r="210"/></g>
-    {Array.from({length:44},(_,i)=>{const a=i*Math.PI*2/44;const x=400+248*Math.cos(a);const y=330+248*Math.sin(a);return <motion.rect key={i} x={x-9} y={y-20} width="18" height="40" rx="3" transform={`rotate(${i*360/44+90} ${x} ${y})`} className={i<22?'detector-cyan':'detector-violet'} initial={{opacity:.1}} animate={{opacity:[.35,1,.35]}} transition={{duration:4,delay:i*.07,repeat:Infinity}}/>;})}
-    <path d="M164 410 L635 250" className="gamma-trail"/><path d="M400 330L635 250" className="gamma-beam"/><path d="M400 330L164 410" className="gamma-beam"/>
-    <motion.circle r="7" className="photon" animate={{cx:[400,635],cy:[330,250],opacity:[1,1,0]}} transition={{duration:2.5,repeat:Infinity}}/><motion.circle r="7" className="photon" animate={{cx:[400,164],cy:[330,410],opacity:[1,1,0]}} transition={{duration:2.5,repeat:Infinity}}/>
-    <circle cx="400" cy="330" r="34" className="atom-halo"/><circle cx="400" cy="330" r="11" className="atom-core"/><path d="M394 330h12m-6-6v12" className="atom-plus"/>
-    <g className="diagram-label"><text x="530" y="230">γ</text><text x="208" y="434">γ</text><text x="445" y="339" className="label-small">e⁺ + e⁻</text></g>
-    <path d="M573 111L645 83h85" className="leader-line"/><text x="647" y="65" className="label-small muted-label">ANNEAU DE DÉTECTION</text>
-    <path d="M394 601v25h150" className="leader-line"/><text x="406" y="650" className="label-small muted-label">PHOTONS EN COÏNCIDENCE</text>
-  </svg>;
+export function DetectorRing({ compact = false }: { compact?: boolean }) {
+  return (
+    <svg
+      className={`detector-ring ${compact ? "compact" : ""}`}
+      viewBox="0 0 800 660"
+      role="img"
+      aria-label="Anneau de détecteurs et deux photons gamma opposés"
+    >
+      <defs>
+        <radialGradient id="ring-light">
+          <stop offset="0" stopColor="var(--primary)" stopOpacity=".13" />
+          <stop offset="1" stopColor="var(--primary)" stopOpacity="0" />
+        </radialGradient>
+        <filter id="ring-glow">
+          <feGaussianBlur stdDeviation="4" />
+        </filter>
+      </defs>
+      <circle cx="400" cy="330" r="270" fill="url(#ring-light)" />
+      <g className="orbit-lines">
+        <ellipse cx="400" cy="330" rx="325" ry="290" />
+        <ellipse cx="400" cy="330" rx="305" ry="270" />
+        <circle cx="400" cy="330" r="210" />
+      </g>
+      {Array.from({ length: 44 }, (_, i) => {
+        const a = (i * Math.PI * 2) / 44;
+        const x = 400 + 248 * Math.cos(a);
+        const y = 330 + 248 * Math.sin(a);
+        return (
+          <motion.rect
+            key={i}
+            x={x - 9}
+            y={y - 20}
+            width="18"
+            height="40"
+            rx="3"
+            transform={`rotate(${(i * 360) / 44 + 90} ${x} ${y})`}
+            className={i < 22 ? "detector-cyan" : "detector-violet"}
+            initial={{ opacity: 0.1 }}
+            animate={{ opacity: [0.35, 1, 0.35] }}
+            transition={{ duration: 4, delay: i * 0.07, repeat: Infinity }}
+          />
+        );
+      })}
+      <path d="M164 410 L635 250" className="gamma-trail" />
+      <path d="M400 330L635 250" className="gamma-beam" />
+      <path d="M400 330L164 410" className="gamma-beam" />
+      <motion.circle
+        r="7"
+        className="photon"
+        animate={{ cx: [400, 635], cy: [330, 250], opacity: [1, 1, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity }}
+      />
+      <motion.circle
+        r="7"
+        className="photon"
+        animate={{ cx: [400, 164], cy: [330, 410], opacity: [1, 1, 0] }}
+        transition={{ duration: 2.5, repeat: Infinity }}
+      />
+      <circle cx="400" cy="330" r="34" className="atom-halo" />
+      <circle cx="400" cy="330" r="11" className="atom-core" />
+      <path d="M394 330h12m-6-6v12" className="atom-plus" />
+      <g className="diagram-label">
+        <text x="530" y="230">
+          γ
+        </text>
+        <text x="208" y="434">
+          γ
+        </text>
+        <text x="445" y="339" className="label-small">
+          e⁺ + e⁻
+        </text>
+      </g>
+      <path d="M573 111L645 83h85" className="leader-line" />
+      <text x="647" y="65" className="label-small muted-label">
+        ANNEAU DE DÉTECTION
+      </text>
+      <path d="M394 601v25h150" className="leader-line" />
+      <text x="406" y="650" className="label-small muted-label">
+        PHOTONS EN COÏNCIDENCE
+      </text>
+    </svg>
+  );
 }
-export function ParticleDiagram({kind}:{kind:string}) {
-  return <svg viewBox="0 0 850 480" className="physics-diagram" role="img" aria-label={kind==='beta'?'Émission d’un positon par le noyau':kind==='annihilation'?'Rencontre du positon et de l’électron':'Émission de deux photons gamma à 180 degrés'}>
-    <defs><marker id="arrow-cyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="var(--primary)"/></marker></defs>
-    {kind==='beta'?<><circle cx="220" cy="240" r="100" className="atom-halo"/>{Array.from({length:13},(_,i)=><circle key={i} cx={220+Math.cos(i*2.4)*((i%3)*22)} cy={240+Math.sin(i*2.4)*((i%3)*22)} r="20" className={i%2?'nucleon-cyan':'nucleon-violet'}/>)}<path d="M320 240L650 150" className="gamma-beam" markerEnd="url(#arrow-cyan)"/><path d="M320 240L650 340" className="dashed-path"/><motion.circle r="15" className="photon" animate={{cx:[300,650],cy:[220,150]}} transition={{duration:3,repeat:Infinity}}/><text x="690" y="160" className="diagram-label">e⁺</text><text x="690" y="350" className="diagram-label">νₑ</text><text x="165" y="405" className="label-small">p → n + e⁺ + νₑ</text></>:kind==='annihilation'?<><path d="M90 240Q160 140 220 230T330 240T440 240" className="dashed-path"/><motion.circle r="24" className="photon" animate={{cx:[90,440],cy:[240,240],opacity:[1,1,0]}} transition={{duration:3,repeat:Infinity}}/><circle cx="465" cy="240" r="24" className="nucleon-violet"/><motion.circle cx="450" cy="240" className="atom-halo" animate={{r:[10,90,10],opacity:[0,.9,0]}} transition={{duration:3,repeat:Infinity}}/><text x="110" y="330" className="diagram-label">e⁺</text><text x="470" y="330" className="diagram-label">e⁻</text><path d="M470 220L720 90M470 260L720 400" className="gamma-beam"/></>:<><path d="M425 240H100M425 240H750" className="gamma-beam" markerEnd="url(#arrow-cyan)"/><circle cx="425" cy="240" r="24" className="atom-core"/><path d="M345 240a80 80 0 0 1 160 0" className="dashed-path"/><text x="390" y="140" className="diagram-label">180°</text><text x="150" y="325" className="diagram-label">γ · 511 keV</text><text x="530" y="325" className="diagram-label">γ · 511 keV</text><motion.circle r="9" className="photon" animate={{cx:[425,100],cy:240}} transition={{duration:2,repeat:Infinity}}/><motion.circle r="9" className="photon" animate={{cx:[425,750],cy:240}} transition={{duration:2,repeat:Infinity}}/></>}
-  </svg>;
+export function ParticleDiagram({ kind }: { kind: string }) {
+  return (
+    <svg
+      viewBox="0 0 850 480"
+      className="physics-diagram"
+      role="img"
+      aria-label={
+        kind === "beta"
+          ? "Émission d’un positon par le noyau"
+          : kind === "annihilation"
+            ? "Rencontre du positon et de l’électron"
+            : "Émission de deux photons gamma à 180 degrés"
+      }
+    >
+      <defs>
+        <marker id="arrow-cyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+          <path d="M0 0L8 4L0 8" fill="var(--primary)" />
+        </marker>
+      </defs>
+      {kind === "beta" ? (
+        <>
+          <circle cx="220" cy="240" r="100" className="atom-halo" />
+          {Array.from({ length: 13 }, (_, i) => (
+            <circle
+              key={i}
+              cx={220 + Math.cos(i * 2.4) * ((i % 3) * 22)}
+              cy={240 + Math.sin(i * 2.4) * ((i % 3) * 22)}
+              r="20"
+              className={i % 2 ? "nucleon-cyan" : "nucleon-violet"}
+            />
+          ))}
+          <path d="M320 240L650 150" className="gamma-beam" markerEnd="url(#arrow-cyan)" />
+          <path d="M320 240L650 340" className="dashed-path" />
+          <motion.circle
+            r="15"
+            className="photon"
+            animate={{ cx: [300, 650], cy: [220, 150] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          <text x="690" y="160" className="diagram-label">
+            e⁺
+          </text>
+          <text x="690" y="350" className="diagram-label">
+            νₑ
+          </text>
+          <text x="165" y="405" className="label-small">
+            p → n + e⁺ + νₑ
+          </text>
+        </>
+      ) : kind === "annihilation" ? (
+        <>
+          <path d="M90 240Q160 140 220 230T330 240T440 240" className="dashed-path" />
+          <motion.circle
+            r="24"
+            className="photon"
+            animate={{ cx: [90, 440], cy: [240, 240], opacity: [1, 1, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          <circle cx="465" cy="240" r="24" className="nucleon-violet" />
+          <motion.circle
+            cx="450"
+            cy="240"
+            className="atom-halo"
+            animate={{ r: [10, 90, 10], opacity: [0, 0.9, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          <text x="110" y="330" className="diagram-label">
+            e⁺
+          </text>
+          <text x="470" y="330" className="diagram-label">
+            e⁻
+          </text>
+          <path d="M470 220L720 90M470 260L720 400" className="gamma-beam" />
+        </>
+      ) : (
+        <>
+          <path d="M425 240H100M425 240H750" className="gamma-beam" markerEnd="url(#arrow-cyan)" />
+          <circle cx="425" cy="240" r="24" className="atom-core" />
+          <path d="M345 240a80 80 0 0 1 160 0" className="dashed-path" />
+          <text x="390" y="140" className="diagram-label">
+            180°
+          </text>
+          <text x="150" y="325" className="diagram-label">
+            γ · 511 keV
+          </text>
+          <text x="530" y="325" className="diagram-label">
+            γ · 511 keV
+          </text>
+          <motion.circle
+            r="9"
+            className="photon"
+            animate={{ cx: [425, 100], cy: 240 }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          <motion.circle
+            r="9"
+            className="photon"
+            animate={{ cx: [425, 750], cy: 240 }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </>
+      )}
+    </svg>
+  );
 }
-export function Cyclotron() { return <svg viewBox="0 0 850 540" className="physics-diagram" role="img" aria-label="Cyclotron : source, dees, spirale et cible"><path d="M405 70a200 200 0 0 0 0 400Z" className="cyclotron-dee"/><path d="M430 70a200 200 0 0 1 0 400Z" className="cyclotron-dee other"/><path d="M415 270c25-35 60 0 25 35s-95 0-60-65 135-30 115 65-180 70-170-70 225-115 240 40-260 175-290-20 260-230 345-40L780 120" className="spiral-path"/><circle cx="415" cy="270" r="13" className="atom-core"/><rect x="760" y="95" width="25" height="55" rx="3" className="nucleon-violet"/><text x="350" y="33" className="label-small">CHAMP MAGNÉTIQUE B ⊗</text><text x="200" y="280" className="diagram-label">Dee 1</text><text x="505" y="280" className="diagram-label">Dee 2</text><text x="330" y="515" className="label-small">SOURCE D’IONS</text><text x="715" y="70" className="label-small">CIBLE</text></svg>; }
-const scannerParts = [ {id:'gantry',name:'Gantry',description:'Structure mécanique qui abrite l’anneau et maintient la géométrie de détection.'}, {id:'ring',name:'Anneau de détection',description:'Les blocs de cristaux et photodétecteurs enregistrent les photons gamma autour du patient.'}, {id:'table',name:'Table motorisée',description:'Elle positionne et déplace précisément le patient dans le champ de détection.'} ];
-export function Scanner() { const [active,setActive]=useState('ring'); return <div className="scanner-interactive"><svg viewBox="0 0 900 480" role="img" aria-label="Schéma de l’appareil TEP"><path d="M220 395V140C220 35 660 35 660 140V395Z" className="scanner-body"/><ellipse cx="440" cy="215" rx="150" ry="153" className="scanner-bore"/><ellipse cx="440" cy="215" rx="124" ry="130" className="dashed-path"/><path d="M370 265L810 345V380L370 300Z" className="scanner-table"/><path d="M700 380v65h70v-55" className="scanner-body"/><path d="M430 248l110 23 75 32-25 19-90-29-83-19" className="patient-body"/><ellipse cx="421" cy="241" rx="22" ry="16" className="patient-body"/><circle cx="300" cy="95" r="11" className="photon"/><circle cx="555" cy="190" r="11" className="photon"/><circle cx="760" cy="362" r="11" className="photon"/></svg><div className="scanner-select">{scannerParts.map(p=><Button key={p.id} variant={active===p.id?'default':'outline'} onMouseEnter={()=>setActive(p.id)} onFocus={()=>setActive(p.id)} onClick={()=>setActive(p.id)}>{p.name}</Button>)}</div><p className="scanner-description">{scannerParts.find(p=>p.id===active)?.description}</p></div>; }
-export function SignalDiagram({mode='signal'}:{mode?:string}) { return <svg viewBox="0 0 850 250" className="signal-diagram" role="img" aria-label="Conversion du photon gamma en lumière puis en impulsion électrique"><path d="M50 125h180" className="gamma-beam"/><text x="80" y="90" className="diagram-label">γ</text><rect x="235" y="65" width="115" height="120" rx="8" className="cyclotron-dee"/>{[85,110,135,160].map((y,i)=><path key={i} d={`M350 125L480 ${y}`} className="light-ray"/>)}<rect x="480" y="65" width="85" height="120" rx="8" className="nucleon-violet"/><path d="M575 125h55l12-70 12 120 12-50h125" className="signal-wave"/><text x="240" y="225" className="label-small">{mode==='crystal'?'SCINTILLATEUR':'CRISTAL'}</text><text x="465" y="225" className="label-small">CAPTEUR</text><text x="665" y="225" className="label-small">SIGNAL</text><motion.circle r="7" className="photon" animate={{cx:[50,230],cy:125,opacity:[1,1,0]}} transition={{duration:2,repeat:Infinity}}/></svg>; }
-export function ImageGrid() { return <svg viewBox="0 0 240 240" className="image-grid" role="img" aria-label="Image fonctionnelle reconstruite, schématique">{Array.from({length:225},(_,i)=>{const x=i%15,y=Math.floor(i/15);const d=Math.hypot(x-7,y-7);return <rect key={i} x={x*16} y={y*16} width="14" height="14" rx="2" className={d<2?'pixel-hot':d<4?'pixel-mid':d<6?'pixel-cool':'pixel-dim'}/>;})}</svg>; }
+export function Cyclotron() {
+  return (
+    <svg
+      viewBox="0 0 850 540"
+      className="physics-diagram"
+      role="img"
+      aria-label="Cyclotron : source, dees, spirale et cible"
+    >
+      <path d="M405 70a200 200 0 0 0 0 400Z" className="cyclotron-dee" />
+      <path d="M430 70a200 200 0 0 1 0 400Z" className="cyclotron-dee other" />
+      <path
+        d="M415 270c25-35 60 0 25 35s-95 0-60-65 135-30 115 65-180 70-170-70 225-115 240 40-260 175-290-20 260-230 345-40L780 120"
+        className="spiral-path"
+      />
+      <circle cx="415" cy="270" r="13" className="atom-core" />
+      <rect x="760" y="95" width="25" height="55" rx="3" className="nucleon-violet" />
+      <text x="350" y="33" className="label-small">
+        CHAMP MAGNÉTIQUE B ⊗
+      </text>
+      <text x="200" y="280" className="diagram-label">
+        Dee 1
+      </text>
+      <text x="505" y="280" className="diagram-label">
+        Dee 2
+      </text>
+      <text x="330" y="515" className="label-small">
+        SOURCE D’IONS
+      </text>
+      <text x="715" y="70" className="label-small">
+        CIBLE
+      </text>
+    </svg>
+  );
+}
+const scannerParts = [
+  {
+    id: "gantry",
+    name: "Gantry",
+    description: "Structure mécanique qui abrite l’anneau et maintient la géométrie de détection.",
+  },
+  {
+    id: "ring",
+    name: "Anneau de détection",
+    description:
+      "Les blocs de cristaux et photodétecteurs enregistrent les photons gamma autour du patient.",
+  },
+  {
+    id: "table",
+    name: "Table motorisée",
+    description: "Elle positionne et déplace précisément le patient dans le champ de détection.",
+  },
+];
+export function Scanner() {
+  const [active, setActive] = useState("ring");
+  return (
+    <div className="scanner-interactive">
+      <div className="scanner-visual">
+        <svg viewBox="0 0 900 480" role="img" aria-label="Schéma de l’appareil TEP">
+          <path d="M220 395V140C220 35 660 35 660 140V395Z" className="scanner-body" />
+          <ellipse cx="440" cy="215" rx="150" ry="153" className="scanner-bore" />
+          <ellipse cx="440" cy="215" rx="124" ry="130" className="dashed-path" />
+          <path d="M370 265L810 345V380L370 300Z" className="scanner-table" />
+          <path d="M700 380v65h70v-55" className="scanner-body" />
+          <path d="M430 248l110 23 75 32-25 19-90-29-83-19" className="patient-body" />
+          <ellipse cx="421" cy="241" rx="22" ry="16" className="patient-body" />
+          <circle cx="300" cy="95" r="11" className="photon" />
+          <circle cx="555" cy="190" r="11" className="photon" />
+          <circle cx="760" cy="362" r="11" className="photon" />
+        </svg>
+        {scannerParts.map((p) => (
+          <Button
+            key={p.id}
+            variant="outline"
+            size="icon"
+            className={`scanner-hotspot hotspot-${p.id}`}
+            aria-label={`Explorer : ${p.name}`}
+            title={p.name}
+            onMouseEnter={() => setActive(p.id)}
+            onFocus={() => setActive(p.id)}
+            onClick={() => setActive(p.id)}
+          >
+            <span>+</span>
+          </Button>
+        ))}
+      </div>
+      <div className="scanner-select">
+        {scannerParts.map((p) => (
+          <Button
+            key={p.id}
+            variant={active === p.id ? "default" : "outline"}
+            onMouseEnter={() => setActive(p.id)}
+            onFocus={() => setActive(p.id)}
+            onClick={() => setActive(p.id)}
+          >
+            {p.name}
+          </Button>
+        ))}
+      </div>
+      <p className="scanner-description">
+        {scannerParts.find((p) => p.id === active)?.description}
+      </p>
+    </div>
+  );
+}
+export function SignalDiagram({ mode = "signal" }: { mode?: string }) {
+  return (
+    <svg
+      viewBox="0 0 850 250"
+      className="signal-diagram"
+      role="img"
+      aria-label="Conversion du photon gamma en lumière puis en impulsion électrique"
+    >
+      <path d="M50 125h180" className="gamma-beam" />
+      <text x="80" y="90" className="diagram-label">
+        γ
+      </text>
+      <rect x="235" y="65" width="115" height="120" rx="8" className="cyclotron-dee" />
+      {[85, 110, 135, 160].map((y, i) => (
+        <path key={i} d={`M350 125L480 ${y}`} className="light-ray" />
+      ))}
+      <rect x="480" y="65" width="85" height="120" rx="8" className="nucleon-violet" />
+      <path d="M575 125h55l12-70 12 120 12-50h125" className="signal-wave" />
+      <text x="240" y="225" className="label-small">
+        {mode === "crystal" ? "SCINTILLATEUR" : "CRISTAL"}
+      </text>
+      <text x="465" y="225" className="label-small">
+        CAPTEUR
+      </text>
+      <text x="665" y="225" className="label-small">
+        SIGNAL
+      </text>
+      <motion.circle
+        r="7"
+        className="photon"
+        animate={{ cx: [50, 230], cy: 125, opacity: [1, 1, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+    </svg>
+  );
+}
+export function ImageGrid() {
+  return (
+    <svg
+      viewBox="0 0 240 240"
+      className="image-grid"
+      role="img"
+      aria-label="Image fonctionnelle reconstruite, schématique"
+    >
+      {Array.from({ length: 225 }, (_, i) => {
+        const x = i % 15,
+          y = Math.floor(i / 15);
+        const d = Math.hypot(x - 7, y - 7);
+        return (
+          <rect
+            key={i}
+            x={x * 16}
+            y={y * 16}
+            width="14"
+            height="14"
+            rx="2"
+            className={
+              d < 2 ? "pixel-hot" : d < 4 ? "pixel-mid" : d < 6 ? "pixel-cool" : "pixel-dim"
+            }
+          />
+        );
+      })}
+    </svg>
+  );
+}
